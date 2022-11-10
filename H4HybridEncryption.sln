@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H4HybridEncryption", "H4HybridEncryption\H4HybridEncryption.csproj", "{CED4C4DB-87E8-4ECD-BFAA-B2D4FBA920CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H4HybridEncryptionServer", "H4HybridEncryptionServer\H4HybridEncryptionServer.csproj", "{43A68A3F-D9EF-4D12-AC19-B2A39DDC5C73}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CED4C4DB-87E8-4ECD-BFAA-B2D4FBA920CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CED4C4DB-87E8-4ECD-BFAA-B2D4FBA920CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CED4C4DB-87E8-4ECD-BFAA-B2D4FBA920CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CED4C4DB-87E8-4ECD-BFAA-B2D4FBA920CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43A68A3F-D9EF-4D12-AC19-B2A39DDC5C73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43A68A3F-D9EF-4D12-AC19-B2A39DDC5C73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43A68A3F-D9EF-4D12-AC19-B2A39DDC5C73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43A68A3F-D9EF-4D12-AC19-B2A39DDC5C73}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5E4F4BB0-C1DE-4401-A501-3F66165EC67B}
+	EndGlobalSection
+EndGlobal
