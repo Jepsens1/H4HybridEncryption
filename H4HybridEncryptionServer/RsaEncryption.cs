@@ -4,17 +4,20 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Serialization;
 
-namespace H4HybridEncryption
+namespace H4HybridEncryptionServer
 {
-    public class RsaCrypto
+    public class RsaEncryption
     {
         private RSACryptoServiceProvider rsa;
         private RSAParameters _privatekey;
-        private RSAParameters _publickey;
+        public RSAParameters _publickey;
+        public RSAParameters _clientkey;
+        public byte[] SessionKey;
 
-        public RsaCrypto()
+        public RsaEncryption()
         {
             rsa = new RSACryptoServiceProvider(2048);
             _privatekey = rsa.ExportParameters(true);
@@ -33,19 +36,30 @@ namespace H4HybridEncryption
                 return null;
             }
         }
-        public string GetPublicKey()
+        public string SetClientKey(string key)
+        {
+            StringReader reader = new StringReader(key);
+            XmlSerializer xs = new XmlSerializer(typeof(RSAParameters));
+            _clientkey = (RSAParameters)xs.Deserialize(reader);
+
+            return "Got public key from client";
+        }
+
+        public byte[] GenerateSessionKey()
         {
 
-            StringWriter sw = new StringWriter();
-            XmlSerializer xs = new XmlSerializer(typeof(RSAParameters));
-            xs.Serialize(sw, _publickey);
-            return sw.ToString();
+            using (Aes aes = Aes.Create())
+            {
+                SessionKey = aes.Key;
+            }
+
+            return EncryptData(SessionKey);
         }
         public byte[] EncryptData(byte[] dataToEncrypt)
         {
             try
             {
-                rsa.ImportParameters(_publickey);
+                rsa.ImportParameters(_clientkey);
                 return rsa.Encrypt(dataToEncrypt, true);
             }
             catch (CryptographicException e)

@@ -19,6 +19,10 @@ namespace H4HybridEncryptionServer
             NetworkStream stream = client.GetStream();
             StreamWriter writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
             StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+            RsaEncryption rsa = new RsaEncryption();
+            AesEncryption aes = new AesEncryption();
+            Console.WriteLine(rsa.SetClientKey(reader.ReadLine()));
+            writer.WriteLine(Convert.ToBase64String(rsa.GenerateSessionKey()));
 
             while (true)
             {
@@ -26,8 +30,9 @@ namespace H4HybridEncryptionServer
                 while (inputLine != null)
                 {
                     inputLine = reader.ReadLine();
-                    writer.WriteLine("Echoing string: " + inputLine);
-                    Console.WriteLine("Echoing string: " + inputLine);
+                    Console.WriteLine("Message from client: " + inputLine);
+                    string test = aes.DecryptMessage(Convert.FromBase64String(inputLine),rsa.SessionKey);
+                    Console.WriteLine("Decrypted string: " + test);
                 }
                 Console.WriteLine("Server saw disconnect from client.");
             }
