@@ -9,53 +9,34 @@ namespace H4HybridEncryptionServer
 {
     public class AesEncryption
     {
-        public byte[] EncryptMessage(string mess, byte[] sessionkey)
+        public byte[] SessionKey;
+
+        public AesEncryption()
         {
-            byte[] encrypted;
-            using (Aes aes = Aes.Create())
-            {
-                aes.Key = sessionkey;
-                aes.IV = GenerateRandomByteArray(16);
-
-                // Create an encryptor to perform the stream transform.
-                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-                // Create the streams used for encryption.
-                using (MemoryStream msEncrypt = new MemoryStream())
-                {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                        {
-                            //Write all data to the stream.
-                            swEncrypt.Write(mess);
-                        }
-                        encrypted = msEncrypt.ToArray();
-                    }
-                }
-            }
-
-            // Return the encrypted bytes from the memory stream.
-            return encrypted;
+            SessionKey = GenerateRandomByteArray(32);
         }
-        public string DecryptMessage(byte[] mess, byte[] sessionkey)
+        public string DecryptMessage(byte[] mess)
         {
             string plaintext = null;
 
             // Create an Aes object
-            // with the specified key and IV.
             using (Aes aes = Aes.Create())
             {
-                aes.Key = sessionkey;
-                byte[] iv = new byte[aes.BlockSize / 8];
-                aes.IV = iv;
-
-                // Create a decryptor to perform the stream transform.
-                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-
-                // Create the streams used for decryption.
+                //Sets the AES key to the SessionKey we got from server
+                aes.Key = SessionKey;
                 using (MemoryStream msDecrypt = new MemoryStream(mess))
                 {
+                    //Reads the first 16 bytes from the message which is where the IV i stored
+                    byte[] iv = new byte[aes.BlockSize / 8];
+                    msDecrypt.Read(iv, 0, iv.Length);
+                    aes.IV = iv;
+
+                    // Create a decryptor to perform the stream transform.
+                    ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+
+                    // Create the streams used for decryption.
+                    //using (MemoryStream msDecrypt = new MemoryStream(mess))
+                    //{
                     using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                     {
                         using (StreamReader srDecrypt = new StreamReader(csDecrypt))
@@ -70,6 +51,39 @@ namespace H4HybridEncryptionServer
             }
 
             return plaintext;
+        }
+        public byte[] EncryptMessage(string mess)
+        {
+            byte[] encrypted;
+            using (Aes aes = Aes.Create())
+            {
+                //Sets key to be equal to SessionKey
+                aes.Key = SessionKey;
+                //Generates a IV with 16 random bytes
+                aes.IV = GenerateRandomByteArray(16);
+
+                // Create an encryptor to perform the stream transform.
+                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+                // Create the streams used for encryption.
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            //Writes the IV, so when we decrypt we can get the first 16 bytes where IV i located
+                            msEncrypt.Write(aes.IV);
+                            //Write all data to the stream.
+                            swEncrypt.Write(mess);
+                        }
+                        encrypted = msEncrypt.ToArray();
+                    }
+                }
+            }
+
+            // Return the encrypted bytes from the memory stream.
+            return encrypted;
         }
         private byte[] GenerateRandomByteArray(int size)
         {

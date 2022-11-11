@@ -24,8 +24,9 @@ namespace H4HybridEncryption
         {
             try
             {
+                //Import our private key when trying to decrypt
                 rsa.ImportParameters(_privatekey);
-                return rsa.Decrypt(dataToDecrypt, true);
+                return rsa.Decrypt(dataToDecrypt, false);
             }
             catch (CryptographicException e)
             {
@@ -35,7 +36,7 @@ namespace H4HybridEncryption
         }
         public string GetPublicKey()
         {
-
+            //We save our public key in xml and returns that xml in string format
             StringWriter sw = new StringWriter();
             XmlSerializer xs = new XmlSerializer(typeof(RSAParameters));
             xs.Serialize(sw, _publickey);
@@ -45,8 +46,9 @@ namespace H4HybridEncryption
         {
             try
             {
+                //Import our public key
                 rsa.ImportParameters(_publickey);
-                return rsa.Encrypt(dataToEncrypt, true);
+                return rsa.Encrypt(dataToEncrypt, false);
             }
             catch (CryptographicException e)
             {

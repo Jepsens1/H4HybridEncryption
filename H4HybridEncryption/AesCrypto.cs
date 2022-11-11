@@ -14,19 +14,24 @@ namespace H4HybridEncryption
             string plaintext = null;
 
             // Create an Aes object
-            // with the specified key and IV.
             using (Aes aes = Aes.Create())
             {
+                //Sets the AES key to the SessionKey we got from server
                 aes.Key = sessionkey;
-                byte[] iv = new byte[aes.BlockSize / 8];
-                aes.IV = iv;
-
-                // Create a decryptor to perform the stream transform.
-                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-
-                // Create the streams used for decryption.
                 using (MemoryStream msDecrypt = new MemoryStream(mess))
                 {
+                    //Reads the first 16 bytes from the message which is where the IV i stored
+                    byte[] iv = new byte[aes.BlockSize / 8];
+                    msDecrypt.Read(iv, 0, iv.Length);
+                    //Sets the IV
+                    aes.IV = iv;
+
+                    // Create a decryptor to perform the stream transform.
+                    ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+
+                    // Create the streams used for decryption.
+                    //using (MemoryStream msDecrypt = new MemoryStream(mess))
+                    //{
                     using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                     {
                         using (StreamReader srDecrypt = new StreamReader(csDecrypt))
@@ -47,7 +52,9 @@ namespace H4HybridEncryption
             byte[] encrypted;
             using (Aes aes = Aes.Create())
             {
+                //Sets key to be equal to SessionKey
                 aes.Key = sessionkey;
+                //Generates a IV with 16 random bytes
                 aes.IV = GenerateRandomByteArray(16);
 
                 // Create an encryptor to perform the stream transform.
@@ -60,6 +67,8 @@ namespace H4HybridEncryption
                     {
                         using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
                         {
+                            //Writes the IV, so when we decrypt we can get the first 16 bytes where IV i located
+                            msEncrypt.Write(aes.IV);
                             //Write all data to the stream.
                             swEncrypt.Write(mess);
                         }
@@ -71,7 +80,7 @@ namespace H4HybridEncryption
             // Return the encrypted bytes from the memory stream.
             return encrypted;
         }
-        private byte[] GenerateRandomByteArray(int size)
+        public byte[] GenerateRandomByteArray(int size)
         {
             using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
             {

@@ -21,8 +21,10 @@ namespace H4HybridEncryptionServer
             StreamReader reader = new StreamReader(stream, Encoding.UTF8);
             RsaEncryption rsa = new RsaEncryption();
             AesEncryption aes = new AesEncryption();
+            //We get the public key from client and saves it
             Console.WriteLine(rsa.SetClientKey(reader.ReadLine()));
-            writer.WriteLine(Convert.ToBase64String(rsa.GenerateSessionKey()));
+            //Sends a rsa encrypted message with our SessionKey
+            writer.WriteLine(Convert.ToBase64String(rsa.EncryptData(aes.SessionKey)));
 
             while (true)
             {
@@ -31,8 +33,14 @@ namespace H4HybridEncryptionServer
                 {
                     inputLine = reader.ReadLine();
                     Console.WriteLine("Message from client: " + inputLine);
-                    string test = aes.DecryptMessage(Convert.FromBase64String(inputLine),rsa.SessionKey);
-                    Console.WriteLine("Decrypted string: " + test);
+                    //Decrypts the message we got from client and Display it
+                    string decrypted = aes.DecryptMessage(Convert.FromBase64String(inputLine));
+                    Console.WriteLine("Decrypted string: " + decrypted);
+                    Console.Write("Enter text to send: ");
+                    //Encrypt message and sends to client
+                    byte[] messagebacktoclient = aes.EncryptMessage(Console.ReadLine());
+                    Console.WriteLine("Sending to Client: " + Convert.ToBase64String(messagebacktoclient));
+                    writer.WriteLine(Convert.ToBase64String(messagebacktoclient));
                 }
                 Console.WriteLine("Server saw disconnect from client.");
             }

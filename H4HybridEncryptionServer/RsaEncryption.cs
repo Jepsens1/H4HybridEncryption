@@ -27,8 +27,9 @@ namespace H4HybridEncryptionServer
         {
             try
             {
+                //Import our private key when trying to decrypt
                 rsa.ImportParameters(_privatekey);
-                return rsa.Decrypt(dataToDecrypt, true);
+                return rsa.Decrypt(dataToDecrypt, false);
             }
             catch (CryptographicException e)
             {
@@ -38,29 +39,20 @@ namespace H4HybridEncryptionServer
         }
         public string SetClientKey(string key)
         {
+            //We take the xml string we got from client and Deserialize and sets _clientkey to that
             StringReader reader = new StringReader(key);
             XmlSerializer xs = new XmlSerializer(typeof(RSAParameters));
             _clientkey = (RSAParameters)xs.Deserialize(reader);
 
             return "Got public key from client";
         }
-
-        public byte[] GenerateSessionKey()
-        {
-
-            using (Aes aes = Aes.Create())
-            {
-                SessionKey = aes.Key;
-            }
-
-            return EncryptData(SessionKey);
-        }
         public byte[] EncryptData(byte[] dataToEncrypt)
         {
             try
             {
+                //Import our ClientKey
                 rsa.ImportParameters(_clientkey);
-                return rsa.Encrypt(dataToEncrypt, true);
+                return rsa.Encrypt(dataToEncrypt, false);
             }
             catch (CryptographicException e)
             {
